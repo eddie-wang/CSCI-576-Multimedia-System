@@ -17,12 +17,14 @@ public class Mypart2 implements ActionListener {
 	private long curSampleTime=0;
 	int curLeft=0,curRight=0;
 	int samplePeriod=0;
-	public Mypart2(BufferedImage originalImg, double d, JFrame jFrame, BufferedImage smapleImg, double e) {
+	int lines=0;
+	public Mypart2(BufferedImage originalImg, double d, JFrame jFrame, BufferedImage smapleImg, double e, int lines) {
 		this.originalImage=originalImg;
 		updateDegreePerMilleSecond=d;
 		f=jFrame;
 		sampleImage=smapleImg;
 		samplePeriod=(int)e;
+		this.lines=lines;
 	}
 
 	public static void main(String[] args) {
@@ -30,28 +32,25 @@ public class Mypart2 implements ActionListener {
 		double speed = Double.valueOf(args[1]);
 		double fps = Double.valueOf(args[2]);
 		BufferedImage originalImg = ImageUtils.createImage(lines);
-		BufferedImage smapleImg = ImageUtils.deepCopy(originalImg);
-		JFrame jFrame=ImageUtils.show(originalImg, smapleImg);
-		Mypart2 mypart2=new Mypart2(originalImg,360*speed/1000,jFrame,smapleImg,1000/fps);
+		BufferedImage sampleImg = ImageUtils.deepCopy(originalImg);
+		JFrame jFrame=ImageUtils.show(originalImg, sampleImg);;
+		Mypart2 mypart2=new Mypart2(originalImg,360*speed/1000,jFrame,sampleImg,1000/fps,lines);
 		Timer timer = new Timer(delay,mypart2);
 		timer.start();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		//System.out.println("dsd");
 		long tmp=System.currentTimeMillis();
-		curLeft=((int)(updateDegreePerMilleSecond*(tmp-lastTime))+curLeft)%360;
-		lastTime=tmp;
+		curLeft=(curLeft-(int)(updateDegreePerMilleSecond*(tmp-lastTime))+360)%360;
+		lastTime=System.currentTimeMillis();;
 		
 		if(tmp-curSampleTime>samplePeriod){
-			System.out.println("a");
-			curRight=((int)(updateDegreePerMilleSecond*(tmp-curSampleTime))+curRight)%360;
-			curSampleTime=tmp;
-			ImageUtils.update(sampleImage,15,curRight);
+			curSampleTime=System.currentTimeMillis();;
+			ImageUtils.update(sampleImage,lines,curLeft);
 		}
-		ImageUtils.update(originalImage,15,curLeft);
-		f.repaint();
 		
+		ImageUtils.update(originalImage,lines,curLeft);
+		f.repaint();
 	}
 }

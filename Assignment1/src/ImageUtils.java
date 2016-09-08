@@ -18,13 +18,13 @@ public class ImageUtils {
 		drawBackground(img);
 		// draw lines
 		for (int i = 0; i < lines; i++) {
-			double degree = 360.00 / lines * i;
+			double degree = (360.00 / lines * i) % 360;
 			drawLine(img, centerX, centerY, degree);
 		}
 		return img;
 	}
 
-	private static void drawBackground(BufferedImage img) {
+	public static void drawBackground(BufferedImage img) {
 		// draw background
 		for (int y = 0; y < img.getHeight(); y++) {
 			for (int x = 0; x < img.getWidth(); x++) {
@@ -41,6 +41,9 @@ public class ImageUtils {
 
 	public static BufferedImage scaleImage(BufferedImage originalImage,
 			double scale, boolean antiAlias) {
+
+		if (scale <= 0.0)
+			return originalImage;
 		// scale=2;
 		antiAlias = false;
 		if (antiAlias) {
@@ -57,6 +60,7 @@ public class ImageUtils {
 			}
 		return newImg;
 	}
+
 
 	private static int getColor(BufferedImage img, int x, int y, double scale) {
 		int color = 0;
@@ -117,13 +121,12 @@ public class ImageUtils {
 			int xDir = (degree >= 0 && degree < 90 || degree > 270
 					&& degree < 360) ? 1 : -1;
 			double y = startY;
-			for (int x = startX; x >= 0 && x < 512; x += xDir) {
+			for (int x = startX; x >= 0 && x < img.getWidth(); x += xDir) {
 				img.setRGB(x, (int) Math.floor(y), color);
-
-				double delta = -xDir*Math.tan(Math.PI / 180 * degree);
+				double delta = -xDir * Math.tan(Math.PI / 180 * degree);
 				y = y + delta;
 				int temp = (int) Math.floor(y);
-				if (!(temp < 512 && temp >= 0))
+				if (!(temp < img.getHeight() && temp >= 0))
 					break;
 			}
 		} else {
@@ -131,22 +134,23 @@ public class ImageUtils {
 			int xDir = (degree >= 0 && degree < 90 || degree < 270
 					&& degree < 180) ? 1 : -1;
 			double x = startX;
-			for (int y = startY; y >= 0 && y < 512; y += yDir) {
+			for (int y = startY; y >= 0 && y < img.getHeight(); y += yDir) {
 				img.setRGB((int) Math.floor(x), y, color);
 				double delta = 1 / Math.tan(Math.PI / 180 * degree) * xDir;
 				x = x + delta;
 				int temp = (int) Math.floor(x);
-				if (!(temp < 512 && temp >= 0))
+				if (!(temp < img.getWidth() && temp >= 0))
 					break;
 			}
 		}
 	}
 
-	public static void update(BufferedImage originalImage, int lines,int cur) {
+	public static void update(BufferedImage originalImage, int lines, int cur) {
 		drawBackground(originalImage);
 		for (int i = 0; i < lines; i++) {
-			double degree = (360.00 / lines * i+cur)%360;
-			drawLine(originalImage, 256, 256, degree);
+			double degree = (360.00 / lines * i + cur) % 360;
+			drawLine(originalImage, originalImage.getWidth() / 2,
+					originalImage.getHeight() / 2, degree);
 		}
 	}
 }
