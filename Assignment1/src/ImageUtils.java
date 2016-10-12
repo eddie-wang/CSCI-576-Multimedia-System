@@ -42,10 +42,9 @@ public class ImageUtils {
 	public static BufferedImage scaleImage(BufferedImage originalImage,
 			double scale, boolean antiAlias) {
 
-		if (scale <= 0.0)
+		if (scale <= 0.0||(scale==1&&antiAlias==false))
 			return originalImage;
 		// scale=2;
-		antiAlias = false;
 		if (antiAlias) {
 			originalImage = lowPassFilter(originalImage);
 		}
@@ -145,12 +144,20 @@ public class ImageUtils {
 		}
 	}
 
-	public static void update(BufferedImage originalImage, int lines, int cur) {
+	public static void update(BufferedImage originalImage, BufferedImage sampleImage, int lines, int cur, double scale, boolean antiAlias, boolean updateSampleImg) {
 		drawBackground(originalImage);
 		for (int i = 0; i < lines; i++) {
 			double degree = (360.00 / lines * i + cur) % 360;
 			drawLine(originalImage, originalImage.getWidth() / 2,
 					originalImage.getHeight() / 2, degree);
 		}
+		if(updateSampleImg==true){
+			BufferedImage temp=scaleImage(originalImage, scale, antiAlias);
+			for (int y = 0; y < sampleImage.getHeight(); y++)
+				for (int x = 0; x < sampleImage.getWidth(); x++) {
+					sampleImage.setRGB(x, y, temp.getRGB(x, y));
+				}
+		}
+		
 	}
 }
